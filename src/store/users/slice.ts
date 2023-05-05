@@ -1,5 +1,32 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
+const DEFAULT_STATE = [
+	{
+		id: "1",
+		name: "Fernando",
+		email: "PeterDoe@gmail.com",
+		github: "Klerith",
+	},
+	{
+		id: "2",
+		name: "Leo",
+		email: "Pingocho@gmail.com",
+		github: "lmarello",
+	},
+	{
+		id: "3",
+		name: "Midudev",
+		email: "Frank@gmail.com",
+		github: "midudev",
+	},
+	{
+		id: "4",
+		name: "Christian Natale",
+		email: "natale.christian.a@gmail.com",
+		github: "Chrisnatalx",
+	},
+];
+
 export type userId = string;
 export interface User {
 	name: string;
@@ -10,32 +37,13 @@ export interface UserWithId extends User {
 	id: userId;
 }
 
-const initialState: UserWithId[] = [
-	{
-		name: "fernando",
-		email: "PeterDoe@gmail.com",
-		github: "Klerith",
-		id: "1",
-	},
-	{
-		name: "Leo",
-		email: "Dalas@gmail.com",
-		github: "lmarello",
-		id: "2",
-	},
-	{
-		name: "Midudev",
-		email: "Frank@gmail.com",
-		github: "midudev",
-		id: "3",
-	},
-	{
-		name: "Christian Natale",
-		email: "natale.christian.a@gmail.com",
-		github: "Chrisnatalx",
-		id: "4",
-	},
-];
+const initialState: UserWithId[] = (() => {
+	const persistanceState = localStorage.getItem("__redux__state__");
+	if (persistanceState) {
+		return JSON.parse(persistanceState).users;
+	}
+	return DEFAULT_STATE;
+})();
 
 export const userSlice = createSlice({
 	name: "user",
@@ -45,9 +53,13 @@ export const userSlice = createSlice({
 			const id = action.payload;
 			return state.filter((user) => user.id !== id);
 		},
+		addNewUser: (state, action: PayloadAction<User>) => {
+			const id = crypto.randomUUID();
+			return [...state, { id, ...action.payload }];
+		},
 	},
 });
 
 export default userSlice.reducer;
 
-export const { deleteUserById } = userSlice.actions;
+export const { addNewUser, deleteUserById } = userSlice.actions;
